@@ -20,7 +20,7 @@ export async function run() {
     core.setOutput('stackId', stackId);
   } catch (error) {
     console.error(error);
-    core.setFailed('No message provided');
+    core.setFailed('Action failed');
   }
 }
 
