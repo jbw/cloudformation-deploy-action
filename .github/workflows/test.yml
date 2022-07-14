@@ -1,4 +1,4 @@
-name: "Test"
+name: 'Test'
 on:
   pull_request:
   push:
@@ -10,7 +10,13 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
+
+      - name: Run unit tests
+        run: |
+          npm install --immutable
+          npm run test
+
       - name: Test Action
         id: test_action
         uses: ./
