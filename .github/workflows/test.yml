@@ -1,0 +1,21 @@
+name: "test"
+on: # rebuild any PRs and main branch changes
+  pull_request:
+  push:
+    branches:
+      - main
+      - next
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Test Action
+        id: test_action
+        uses: ./
+        with:
+          name: "Hello, World!"
+
+      - name: log action output
+        run: echo ${{steps.test_action.outputs.name}}
