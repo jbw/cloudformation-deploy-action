@@ -2,14 +2,14 @@
   "name": "cloudformation-deploy-action",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "lib/index.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
     "test": "jest",
     "lint": "eslint --ext .ts src",
-    "build": "tsc",
+    "build": "rimraf lib && tsc",
     "pack": "ncc build"
   },
   "repository": {
@@ -27,12 +27,13 @@
     "@types/node": "^18.0.4",
     "@typescript-eslint/eslint-plugin": "^5.30.6",
     "@typescript-eslint/parser": "^5.30.6",
-    "@zeit/ncc": "^0.22.3",
+    "@vercel/ncc": "^0.34.0",
     "eslint": "^8.19.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-jest": "^26.5.3",
     "eslint-plugin-prettier": "^4.2.1",
     "prettier": "^2.7.1",
+    "rimraf": "^3.0.2",
     "ts-jest": "^28.0.6",
     "typescript": "^4.7.4"
   },
