@@ -33,15 +33,15 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = void 0;
 const core = __importStar(__nccwpck_require__(271));
 async function run() {
-    try {
-        const name = core.getInput("name");
-        core.setOutput("name", name);
+    const name = core.getInput("message");
+    if (name) {
+        core.debug(`Hello ${name}!`);
+        return core.setOutput("outputMessage", name);
     }
-    catch (error) {
-        core.setFailed(error.message);
-    }
+    core.setFailed("No message provided");
 }
 exports.run = run;
+run();
 //# sourceMappingURL=index.js.map
 
 /***/ }),
