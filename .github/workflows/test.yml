@@ -21,7 +21,7 @@ jobs:
         id: test_action
         uses: ./
         with:
-          message: "Hello, World!"
+          stackName: 'test-stack'
 
       - name: log action output
         run: echo ${{steps.test_action.outputs.outputMessage}}
