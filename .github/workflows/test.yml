@@ -1,5 +1,5 @@
-name: "test"
-on: # rebuild any PRs and main branch changes
+name: "Test"
+on:
   pull_request:
   push:
     branches:
@@ -15,7 +15,7 @@ jobs:
         id: test_action
         uses: ./
         with:
-          name: "Hello, World!"
+          message: "Hello, World!"
 
       - name: log action output
-        run: echo ${{steps.test_action.outputs.name}}
+        run: echo ${{steps.test_action.outputs.outputMessage}}
