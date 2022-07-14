@@ -1,12 +1,12 @@
-name: "CloudFormation Deploy Action"
-author: "jbw"
-description: "Deploys a CloudFormation stack"
+name: 'CloudFormation Deploy Action'
+author: 'jbw'
+description: 'Deploys a CloudFormation stack'
 
 inputs:
-  message:
-    description: "The name of the stack to deploy"
+  stackName:
+    description: 'The name of the stack to deploy'
     required: true
-    default: "Hello"
+    default: ''
 
 runs:
   using: node16
