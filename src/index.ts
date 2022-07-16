@@ -1,7 +1,6 @@
 import * as core from '@actions/core';
 import { CloudFormationStack } from './cloud-formation-stack';
 
-// Create github action
 export async function run() {
   try {
     const stackName = core.getInput('stackName');
@@ -9,13 +8,14 @@ export async function run() {
     const stack = new CloudFormationStack({
       stack: {
         name: stackName,
+        template: { filepath: 'test/test-template.json' },
       },
       client: {
         region: 'us-east-1',
       },
     });
 
-    const stackId = await stack.deploy();
+    const stackId = await stack.deploy({ waitFor: true });
 
     core.setOutput('stackId', stackId);
   } catch (error) {
@@ -24,4 +24,5 @@ export async function run() {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
 run();
