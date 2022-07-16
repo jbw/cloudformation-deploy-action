@@ -1,30 +1,30 @@
-import AWSMock from 'aws-sdk-mock';
-import AWS from 'aws-sdk';
 import { CloudFormationStack } from '../src/cloud-formation-stack';
-AWSMock.setSDKInstance(AWS);
 
 describe('deploy', () => {
   it('should deploy', async () => {
     // given
-    AWSMock.mock('CloudFormation', 'createStack', (params: any, callback: any) => {
-      callback(null, {
-        StackId: 'stackId',
-      });
-    });
 
+    // create timestamp
+    const timestamp = new Date().getTime();
+    const stackName = 'test-stack' + timestamp;
     const stack = new CloudFormationStack({
       stack: {
-        name: 'test-stack',
+        name: stackName,
+        template: { filepath: 'test/test-template.json' },
       },
       client: {
         region: 'us-east-1',
+        endpoint: 'http://localhost:4566',
+        accessKeyId: 'accessKeyId',
+        secretAccessKey: 'secretAccessKey',
       },
     });
 
     // when
-    const stackId = await stack.deploy();
+    const resp = await stack.deploy();
 
     // then
-    expect(stackId).toBe('stackId');
+    expect(resp.stackId).toContain(stackName);
+    expect(resp.status).toBe('200');
   });
 });
