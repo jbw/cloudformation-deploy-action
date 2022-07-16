@@ -2,6 +2,7 @@ import * as AWS from 'aws-sdk';
 import { Stack } from 'aws-sdk/clients/cloudformation';
 import { PromiseResult } from 'aws-sdk/lib/request';
 import * as fs from 'fs';
+
 import { CloudFormationClientOptions } from './client-options';
 import { CloudFormationStackOptions } from './cloud-formation-stack-options';
 import { CloudFormationStackResponse } from './cloud-formation-stack-response';
@@ -109,11 +110,9 @@ export class CloudFormationStack {
         if (error.code === 'ValidationError') {
           return undefined;
         }
-
         throw error;
       }
     }
-
     return undefined;
   }
 
