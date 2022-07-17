@@ -1,3 +1,3 @@
 import * as AWS from 'aws-sdk';
 
-export type ErrorOrAwsError = AWS.AWSError | Error;
+export type ErrorOrAwsError = AWS.AWSError | Error | unknown;

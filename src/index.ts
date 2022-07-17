@@ -1,11 +1,12 @@
 import * as core from '@actions/core';
+
 import { CloudFormationStack } from './cloud-formation-stack';
 
 export async function run() {
   try {
     const stackName = core.getInput('stackName');
 
-    const stack = new CloudFormationStack({
+    const stack = CloudFormationStack.createStack({
       stack: {
         name: stackName,
         template: { filepath: 'test/test-template.json' },
