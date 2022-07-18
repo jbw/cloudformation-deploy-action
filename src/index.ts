@@ -1,8 +1,8 @@
 import * as core from '@actions/core';
 import path from 'path';
 
-import { CloudFormationStack } from './cloud-formation-stack';
-import { Template } from './template';
+import { CloudFormationStack } from './cloudformation/stack/cloud-formation-stack';
+import { Template } from './cloudformation/stack/cloud-formation-stack-options';
 
 const AWS_ENDPOINT_URL = process.env['AWS_ENDPOINT_URL'];
 const AWS_ACCESS_KEY_ID = process.env['AWS_ACCESS_KEY_ID'];
@@ -55,7 +55,7 @@ export async function run() {
       },
     });
 
-    const stackId = await stack.deploy({ waitFor: true });
+    const stackId = await stack.deploy();
 
     core.setOutput('stackId', stackId);
   } catch (error) {

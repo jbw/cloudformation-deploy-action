@@ -1,4 +1,5 @@
-import { CloudFormationStack } from '../src/cloud-formation-stack';
+import { CloudFormationStack } from '../src/cloudformation/stack/cloud-formation-stack';
+import { CloudFormationStackOptions } from '../src/cloudformation/stack/cloud-formation-stack-options';
 
 const LOCALSTACK_URL = process.env['LOCALSTACK_URL'] ?? 'http://localhost:4566';
 
@@ -34,10 +35,11 @@ describe('deploy', () => {
     // given
     const timestamp = new Date().getTime().toString();
     const stackName = 'test-stack' + timestamp;
-    const options = {
+    const options: CloudFormationStackOptions = {
       stack: {
         name: stackName,
         template: { filepath: 'test/test-template.json' },
+        waitFor: true,
       },
       client: {
         region: 'us-east-1',
@@ -53,8 +55,8 @@ describe('deploy', () => {
     const stack2 = CloudFormationStack.createStack(options);
 
     // when
-    const resp = await stack.deploy({ waitFor: true });
-    const updateResp = await stack2.deploy({ waitFor: true });
+    const resp = await stack.deploy();
+    const updateResp = await stack2.deploy();
 
     // then
     expect(resp.stackId).toContain(stackName);
@@ -67,10 +69,11 @@ describe('deploy', () => {
     // given
     const timestamp = new Date().getTime().toString();
     const stackName = 'test-stack' + timestamp;
-    const options = {
+    const options: CloudFormationStackOptions = {
       stack: {
         name: stackName,
         template: { filepath: 'test/test-template.json' },
+        waitFor: true,
       },
       client: {
         region: 'us-east-1',
@@ -83,9 +86,9 @@ describe('deploy', () => {
     const stack = CloudFormationStack.createStack(options);
 
     // when
-    await stack.deploy({ waitFor: true });
-    await stack.deploy({ waitFor: true });
-    const resp = await stack.deploy({ waitFor: true });
+    await stack.deploy();
+    await stack.deploy();
+    const resp = await stack.deploy();
 
     // then
     expect(resp.stackId).toContain(stackName);
@@ -96,10 +99,11 @@ describe('deploy', () => {
     // given
     const timestamp = new Date().getTime().toString();
     const stackName = 'test-stack' + timestamp;
-    const options = {
+    const options: CloudFormationStackOptions = {
       stack: {
         name: stackName,
         template: { filepath: 'test/test-template-changeset-test.json' },
+        waitFor: true,
       },
       client: {
         region: 'us-east-1',
@@ -112,9 +116,9 @@ describe('deploy', () => {
     const stack = CloudFormationStack.createStack(options);
 
     // when
-    const resp = await stack.deploy({ waitFor: true });
+    const resp = await stack.deploy();
     // run the same stack twice - should be 0 changes
-    await stack.deploy({ waitFor: true });
+    await stack.deploy();
 
     // then
     expect(resp.stackId).toContain(stackName);
@@ -125,10 +129,11 @@ describe('deploy', () => {
     // given
     const timestamp = new Date().getTime().toString();
     const stackName = 'test-stack' + timestamp;
-    const options = {
+    const options: CloudFormationStackOptions = {
       stack: {
         name: stackName,
         template: { filepath: 'test/test-template-changeset-test.json' },
+        waitFor: true,
       },
       client: {
         region: 'us-east-1',
@@ -141,10 +146,10 @@ describe('deploy', () => {
     const stack = CloudFormationStack.createStack(options);
 
     // when
-    const resp = await stack.deploy({ waitFor: true });
+    const resp = await stack.deploy();
 
     options.stack.template.filepath = 'test/test-template-empty.json';
-    await stack.deploy({ waitFor: true });
+    await stack.deploy();
 
     // then
     expect(resp.stackId).toContain(stackName);
