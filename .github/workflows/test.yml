@@ -19,7 +19,7 @@ jobs:
           - 4571:4571
 
     env:
-      LOCALSTACK_URL: http://localstack:4566
+      LOCALSTACK_URL: http://localhost:4566
 
     runs-on: ubuntu-latest
     steps:
