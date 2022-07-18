@@ -29,13 +29,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Run unit tests
-        run: |
-          npm install --immutable
-          npm run test
-
       - name: Test Action
         id: test_action
+        env:
+          LOCALSTACK_URL: http://localhost:4566
+          AWS_ACCESS_KEY_ID: test
+          AWS_SECRET_ACCESS_KEY: test
+          AWS_ENDPOINT_URL: http://localhost:4566
+          AWS_DEFAULT_REGION: us-east-1
         uses: ./
         with:
           stackName: 'test-stack'
@@ -46,6 +47,11 @@ jobs:
           executeChangeSet: true
           enableRollback: false
           terminationProtection: false
+
+      # - name: Run unit tests
+      #   run: |
+      #     npm install --immutable
+      #     npm run test
 
       - name: Output
         run: echo ${{steps.test_action.outputs.stackId}}

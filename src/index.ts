@@ -4,7 +4,9 @@ import { CloudFormationStack } from './cloud-formation-stack';
 import { Template } from './template';
 
 const AWS_ENDPOINT_URL = process.env['AWS_ENDPOINT_URL'];
-
+const AWS_ACCESS_KEY_ID = process.env['AWS_ACCESS_KEY_ID'];
+const AWS_SECRET_ACCESS_KEY = process.env['AWS_SECRET_ACCESS_KEY'];
+const AWS_REGION = process.env['AWS_REGION'];
 export async function run() {
   try {
     const stackName = core.getInput('stackName');
@@ -42,6 +44,8 @@ export async function run() {
       },
       client: {
         region: 'us-east-1',
+        accessKeyId: AWS_ACCESS_KEY_ID,
+        secretAccessKey: AWS_SECRET_ACCESS_KEY,
         endpoint: AWS_ENDPOINT_URL,
       },
     });
