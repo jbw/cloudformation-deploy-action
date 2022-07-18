@@ -9,7 +9,7 @@ inputs:
     default: ''
 
   templateFile:
-    description: 'The path to the template file'
+    description: 'The relative path to the template file'
     required: true
     default: ''
 

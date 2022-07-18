@@ -1,4 +1,5 @@
 import * as core from '@actions/core';
+import path from 'path';
 
 import { CloudFormationStack } from './cloud-formation-stack';
 import { Template } from './template';
@@ -7,6 +8,8 @@ const AWS_ENDPOINT_URL = process.env['AWS_ENDPOINT_URL'];
 const AWS_ACCESS_KEY_ID = process.env['AWS_ACCESS_KEY_ID'];
 const AWS_SECRET_ACCESS_KEY = process.env['AWS_SECRET_ACCESS_KEY'];
 const AWS_REGION = process.env['AWS_DEFAULT_REGION'];
+const { GITHUB_WORKSPACE = __dirname } = process.env;
+
 export async function run() {
   try {
     const stackName = core.getInput('stackName');
@@ -25,7 +28,9 @@ export async function run() {
     const parameterOverrides = core.getInput('parameterOverrides') || '{}';
 
     // filepath takes precedence over url
-    const template: Template = templateFilePath ? { filepath: templateFilePath } : { url: templateUrl };
+    const template: Template = templateFilePath
+      ? { filepath: path.join(GITHUB_WORKSPACE, templateFilePath) }
+      : { url: templateUrl };
 
     const stack = CloudFormationStack.createStack({
       stack: {
