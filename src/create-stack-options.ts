@@ -12,4 +12,5 @@ export type CloudFormationCreateStackOptions = {
   roleArn?: string;
   tags?: { [key: string]: string };
   notificationArn?: string;
+  parameterOverrides?: { [key: string]: string };
 };

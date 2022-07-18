@@ -63,6 +63,11 @@ inputs:
     required: false
     default: ''
 
+  parameterOverrides:
+    description: 'The parameter overrides to add to the stack'
+    required: false
+    default: ''
+
 runs:
   using: node16
   main: dist/index.js
