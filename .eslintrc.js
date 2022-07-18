@@ -13,7 +13,6 @@ module.exports = {
   plugins: ['@typescript-eslint'],
   extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended', 'prettier'],
   rules: {
-    'no-console': 'warn',
     'require-await': 'off',
     'no-return-await': 'off',
     '@typescript-eslint/return-await': 'error',
