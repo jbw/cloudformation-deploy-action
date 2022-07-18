@@ -40,7 +40,7 @@ jobs:
         uses: ./
         with:
           stackName: 'test-stack'
-          templateFile: 'test/test-template.yml'
+          templateFile: 'test/test-template.json'
           capabilities: 'CAPABILITY_IAM'
           timeout: 60
           wait: true
