@@ -8,6 +8,61 @@ inputs:
     required: true
     default: ''
 
+  templateFile:
+    description: 'The path to the template file'
+    required: true
+    default: ''
+
+  templateUrl:
+    description: 'The URL to the template file'
+    required: false
+    default: ''
+
+  capabilities:
+    description: 'The capabilities to add to the stack'
+    required: false
+    default: 'CAPABILITY_IAM'
+
+  timeout:
+    description: 'The timeout for the stack operation'
+    required: false
+    default: '60'
+
+  wait:
+    description: 'Wait for the stack operation to complete'
+    required: false
+    default: 'true'
+
+  executeChangeSet:
+    description: 'Execute the change set'
+    required: false
+    default: 'true'
+
+  enableRollback:
+    description: 'Enable rollback on stack failure'
+    required: false
+    default: 'false'
+
+  terminationProtection:
+    description: 'Enable termination protection'
+    required: false
+    default: 'false'
+
+  roleArn:
+    description: 'The ARN of the role to use for the stack'
+    required: false
+    default: ''
+
+  notificationArn:
+    description: 'The ARN of the notification topics to use for the stack'
+    required: false
+    default: ''
+
+  tags:
+    description: 'The tags to add to the stack'
+    required: false
+    default: ''
+
 runs:
   using: node16
   main: dist/index.js

@@ -1,15 +1,40 @@
 import * as core from '@actions/core';
 
 import { CloudFormationStack } from './cloud-formation-stack';
+import { Template } from './template';
 
 export async function run() {
   try {
     const stackName = core.getInput('stackName');
+    const templateFilePath = core.getInput('templateFile');
+    const templateUrl = core.getInput('templateUrl');
+
+    const capabilities = core.getInput('capabilities');
+    const timeout = core.getInput('timeout');
+    const waitFor = core.getInput('wait');
+    const executeChangeSet = core.getInput('executeChangeSet');
+    const enableRollback = core.getInput('enableRollback');
+    const roleArn = core.getInput('roleArn');
+    const tags = core.getInput('tags');
+    const notificationArn = core.getInput('notificationArn');
+    const terminationProtection = core.getInput('terminationProtection');
+
+    // filepath takes precedence over url
+    const template: Template = templateFilePath ? { filepath: templateFilePath } : { url: templateUrl };
 
     const stack = CloudFormationStack.createStack({
       stack: {
         name: stackName,
-        template: { filepath: 'test/test-template.json' },
+        template: template,
+        capabilities: [...capabilities.split(',').map((cap) => cap.trim())],
+        timeout: parseInt(timeout),
+        waitFor: new Boolean(waitFor) as boolean,
+        executeChangeSet: new Boolean(executeChangeSet) as boolean,
+        enableRollback: new Boolean(enableRollback) as boolean,
+        terminationProtection: new Boolean(terminationProtection) as boolean,
+        roleArn,
+        tags: JSON.parse(tags),
+        notificationArn,
       },
       client: {
         region: 'us-east-1',
