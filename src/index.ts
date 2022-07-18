@@ -3,6 +3,8 @@ import * as core from '@actions/core';
 import { CloudFormationStack } from './cloud-formation-stack';
 import { Template } from './template';
 
+const AWS_ENDPOINT_URL = process.env['AWS_ENDPOINT_URL'];
+
 export async function run() {
   try {
     const stackName = core.getInput('stackName');
@@ -36,9 +38,11 @@ export async function run() {
         roleArn,
         tags: JSON.parse(tags),
         notificationArn,
+        parameterOverrides: JSON.parse(parameterOverrides),
       },
       client: {
         region: 'us-east-1',
+        endpoint: AWS_ENDPOINT_URL,
       },
     });
 
