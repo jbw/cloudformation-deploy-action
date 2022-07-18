@@ -1,8 +1,8 @@
 import * as AWS from 'aws-sdk';
 import { Stack } from 'aws-sdk/clients/cloudformation';
 import * as fs from 'fs';
-import { AWSWaitForResp } from './aws-wait-for-resp';
 
+import { AWSWaitForResp } from './aws-wait-for-resp';
 import { CloudFormationClientOptions } from './client-options';
 import { CloudFormationChangeSet } from './cloud-formation-change-set';
 import { CloudFormationStackOptions } from './cloud-formation-stack-options';
