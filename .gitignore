@@ -50,3 +50,6 @@ coverage
 .vscode-test
 
 lib
+
+# localstack
+volume/
