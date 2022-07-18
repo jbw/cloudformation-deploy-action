@@ -43,7 +43,7 @@ export async function run() {
         parameterOverrides: JSON.parse(parameterOverrides),
       },
       client: {
-        region: 'us-east-1',
+        region: AWS_REGION,
         accessKeyId: AWS_ACCESS_KEY_ID,
         secretAccessKey: AWS_SECRET_ACCESS_KEY,
         endpoint: AWS_ENDPOINT_URL,
