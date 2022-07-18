@@ -23,6 +23,13 @@ jobs:
         uses: ./
         with:
           stackName: 'test-stack'
+          templateFile: './test/test-template.yml'
+          capabilities: 'CAPABILITY_IAM'
+          timeout: 60
+          wait: true
+          executeChangeSet: true
+          enableRollback: false
+          terminationProtection: false
 
-      - name: log action output
-        run: echo ${{steps.test_action.outputs.outputMessage}}
+      - name: Output
+        run: echo ${{steps.test_action.outputs.stackId}}
