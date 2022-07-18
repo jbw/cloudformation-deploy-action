@@ -1,5 +1,7 @@
 import { CloudFormationStack } from '../src/cloud-formation-stack';
 
+const LOCALSTACK_URL = process.env['LOCALSTACK_URL'] ?? 'http://localhost:4566';
+
 describe('deploy', () => {
   it('should deploy', async () => {
     // given
@@ -12,7 +14,7 @@ describe('deploy', () => {
       },
       client: {
         region: 'us-east-1',
-        endpoint: 'http://localhost:4566',
+        endpoint: LOCALSTACK_URL,
         accessKeyId: 'accessKeyId',
         secretAccessKey: 'secretAccessKey',
       },
@@ -39,7 +41,7 @@ describe('deploy', () => {
       },
       client: {
         region: 'us-east-1',
-        endpoint: 'http://localhost:4566',
+        endpoint: LOCALSTACK_URL,
         accessKeyId: 'accessKeyId',
         secretAccessKey: 'secretAccessKey',
       },
@@ -72,7 +74,7 @@ describe('deploy', () => {
       },
       client: {
         region: 'us-east-1',
-        endpoint: 'http://localhost:4566',
+        endpoint: LOCALSTACK_URL,
         accessKeyId: 'accessKeyId',
         secretAccessKey: 'secretAccessKey',
       },
@@ -101,7 +103,7 @@ describe('deploy', () => {
       },
       client: {
         region: 'us-east-1',
-        endpoint: 'http://localhost:4566',
+        endpoint: LOCALSTACK_URL,
         accessKeyId: 'accessKeyId',
         secretAccessKey: 'secretAccessKey',
       },
@@ -130,7 +132,7 @@ describe('deploy', () => {
       },
       client: {
         region: 'us-east-1',
-        endpoint: 'http://localhost:4566',
+        endpoint: LOCALSTACK_URL,
         accessKeyId: 'accessKeyId',
         secretAccessKey: 'secretAccessKey',
       },

@@ -8,7 +8,19 @@ on:
       - alpha
 
 jobs:
+  # add localstack
+
   test:
+    services:
+      localstack:
+        image: localstack/localstack
+        ports:
+          - 4566:4566
+          - 4571:4571
+
+    env:
+      LOCALSTACK_URL: http://localstack:4566
+
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
