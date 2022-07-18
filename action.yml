@@ -61,7 +61,7 @@ inputs:
   tags:
     description: 'The tags to add to the stack'
     required: false
-    default: ''
+    default: '{}'
 
   parameterOverrides:
     description: 'The parameter overrides to add to the stack'

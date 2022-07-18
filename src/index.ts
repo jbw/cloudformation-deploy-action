@@ -19,7 +19,7 @@ export async function run() {
     const executeChangeSet = core.getInput('executeChangeSet');
     const enableRollback = core.getInput('enableRollback');
     const roleArn = core.getInput('roleArn');
-    const tags = core.getInput('tags');
+    const tags = core.getInput('tags') || '{}';
     const notificationArn = core.getInput('notificationArn');
     const terminationProtection = core.getInput('terminationProtection');
     const parameterOverrides = core.getInput('parameterOverrides') || '{}';
