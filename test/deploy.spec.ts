@@ -31,7 +31,7 @@ describe('deploy', () => {
     expect(resp.status).toBe('200');
   });
 
-  it('should update', async () => {
+  it.only('should update', async () => {
     // given
     const timestamp = new Date().getTime().toString();
     const stackName = 'test-stack' + timestamp;
@@ -40,6 +40,7 @@ describe('deploy', () => {
         name: stackName,
         template: { filepath: 'test/test-template.json' },
         waitFor: true,
+        deleteFailedChangeSet: false,
       },
       client: {
         region: 'us-east-1',
@@ -49,110 +50,13 @@ describe('deploy', () => {
       },
     };
 
-    const stack = CloudFormationStack.createStack(options);
-
+    // when
+    await CloudFormationStack.createStack(options).deploy();
     options.stack.template.filepath = 'test/test-template-update.json';
-    const stack2 = CloudFormationStack.createStack(options);
-
-    // when
-    const resp = await stack.deploy();
-    const updateResp = await stack2.deploy();
+    const updated = await CloudFormationStack.createStack(options).deploy();
 
     // then
-    expect(resp.stackId).toContain(stackName);
-    expect(resp.status).toBe('200');
-    expect(updateResp.stackId).toContain(stackName);
-    expect(updateResp.status).toBe('200');
-  }, 500000);
-
-  it('should handle changesets already executed', async () => {
-    // given
-    const timestamp = new Date().getTime().toString();
-    const stackName = 'test-stack' + timestamp;
-    const options: CloudFormationStackOptions = {
-      stack: {
-        name: stackName,
-        template: { filepath: 'test/test-template.json' },
-        waitFor: true,
-      },
-      client: {
-        region: 'us-east-1',
-        endpoint: LOCALSTACK_URL,
-        accessKeyId: 'accessKeyId',
-        secretAccessKey: 'secretAccessKey',
-      },
-    };
-
-    const stack = CloudFormationStack.createStack(options);
-
-    // when
-    await stack.deploy();
-    await stack.deploy();
-    const resp = await stack.deploy();
-
-    // then
-    expect(resp.stackId).toContain(stackName);
-    expect(resp.status).toBe('200');
-  }, 500000);
-
-  it('should clean up empty change sets', async () => {
-    // given
-    const timestamp = new Date().getTime().toString();
-    const stackName = 'test-stack' + timestamp;
-    const options: CloudFormationStackOptions = {
-      stack: {
-        name: stackName,
-        template: { filepath: 'test/test-template-changeset-test.json' },
-        waitFor: true,
-      },
-      client: {
-        region: 'us-east-1',
-        endpoint: LOCALSTACK_URL,
-        accessKeyId: 'accessKeyId',
-        secretAccessKey: 'secretAccessKey',
-      },
-    };
-
-    const stack = CloudFormationStack.createStack(options);
-
-    // when
-    const resp = await stack.deploy();
-    // run the same stack twice - should be 0 changes
-    await stack.deploy();
-
-    // then
-    expect(resp.stackId).toContain(stackName);
-    expect(resp.status).toBe('200');
-  }, 500000);
-
-  it('should clean up change sets when an error occurs', async () => {
-    // given
-    const timestamp = new Date().getTime().toString();
-    const stackName = 'test-stack' + timestamp;
-    const options: CloudFormationStackOptions = {
-      stack: {
-        name: stackName,
-        template: { filepath: 'test/test-template-changeset-test.json' },
-        waitFor: true,
-      },
-      client: {
-        region: 'us-east-1',
-        endpoint: LOCALSTACK_URL,
-        accessKeyId: 'accessKeyId',
-        secretAccessKey: 'secretAccessKey',
-      },
-    };
-
-    const stack = CloudFormationStack.createStack(options);
-
-    // when
-    const resp = await stack.deploy();
-
-    options.stack.template.filepath = 'test/test-template-empty.json';
-    await stack.deploy();
-
-    // then
-    expect(resp.stackId).toContain(stackName);
-    expect(resp.status).toBe('200');
+    expect(updated.stackId).toContain(stackName);
+    expect(updated.status).toBe('200');
   }, 500000);
 });
