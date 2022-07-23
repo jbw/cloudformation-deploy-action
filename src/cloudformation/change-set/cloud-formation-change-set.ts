@@ -10,6 +10,7 @@ export class CloudFormationChangeSet {
     template: string;
     waitFor?: boolean;
     execute?: boolean;
+    deleteFailedChangeSets?: boolean;
   }) {
     const { changeSetName, stackName, template, waitFor, execute } = options;
 
@@ -60,7 +61,7 @@ export class CloudFormationChangeSet {
     };
   }
 
-  public async delete(changeSetName: string, stackName: string) {
+  public async delete(changeSetName: string, stackName: string, deleteFailedChangeSets?: boolean) {
     const changeSetStatus = await this.cf
       .describeChangeSet({
         ChangeSetName: changeSetName,
@@ -68,15 +69,16 @@ export class CloudFormationChangeSet {
       })
       .promise();
 
-    // todo add option to delete failed change sets
     if (changeSetStatus.Status === 'FAILED') {
-      console.debug('Change set failed. Deleting...');
-      await this.cf
-        .deleteChangeSet({
-          ChangeSetName: changeSetName,
-          StackName: stackName,
-        })
-        .promise();
+      if (deleteFailedChangeSets) {
+        console.debug('Change set failed. Deleting...');
+        await this.cf
+          .deleteChangeSet({
+            ChangeSetName: changeSetName,
+            StackName: stackName,
+          })
+          .promise();
+      }
     }
   }
 

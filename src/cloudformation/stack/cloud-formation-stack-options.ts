@@ -16,6 +16,7 @@ export type CloudFormationCreateStackOptions = {
   tags?: { [key: string]: string };
   notificationArn?: string;
   parameterOverrides?: { [key: string]: string };
+  deleteFailedChangeSet?: boolean;
 };
 
 export type CloudFormationClientOptions = {

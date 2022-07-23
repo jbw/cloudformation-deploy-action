@@ -26,7 +26,7 @@ export async function run() {
     const notificationArn = core.getInput('notificationArn');
     const terminationProtection = core.getInput('terminationProtection');
     const parameterOverrides = core.getInput('parameterOverrides') || '{}';
-
+    const deleteFailedChangeSet = core.getInput('deleteFailedChangeSet');
     // filepath takes precedence over url
     const template: Template = templateFilePath
       ? { filepath: path.join(GITHUB_WORKSPACE, templateFilePath) }
@@ -46,6 +46,7 @@ export async function run() {
         tags: JSON.parse(tags),
         notificationArn,
         parameterOverrides: JSON.parse(parameterOverrides),
+        deleteFailedChangeSet: new Boolean(deleteFailedChangeSet) as boolean,
       },
       client: {
         region: AWS_REGION,
