@@ -8,8 +8,6 @@ on:
       - alpha
 
 jobs:
-  # add localstack
-
   test:
     services:
       localstack:
@@ -48,10 +46,7 @@ jobs:
           enableRollback: false
           terminationProtection: false
 
-      # - name: Run unit tests
-      #   run: |
-      #     npm install --immutable
-      #     npm run test
-
-      - name: Output
-        run: echo ${{steps.test_action.outputs.stackId}}
+      - name: Integration tests
+        run: |
+          npm install --immutable
+          npm run test
