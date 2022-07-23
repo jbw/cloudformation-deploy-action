@@ -31,7 +31,7 @@ describe('deploy', () => {
     expect(resp.status).toBe('200');
   });
 
-  it.only('should update', async () => {
+  it('should update', async () => {
     // given
     const timestamp = new Date().getTime().toString();
     const stackName = 'test-stack' + timestamp;
