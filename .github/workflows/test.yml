@@ -50,6 +50,7 @@ jobs:
           parameterOverridesFilePath: 'test/parameters.json'
 
       - name: Integration tests
+        timeout-minutes: 5
         run: |
           npm install --immutable
           npm run test
