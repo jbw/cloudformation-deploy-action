@@ -59,4 +59,4 @@ jobs:
 
         run: |
           npm install --immutable
-          npm run test
+          npm run test --runInBand --detectOpenHandles --forceExit

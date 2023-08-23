@@ -58,12 +58,12 @@ describe('deploy', () => {
   it('should update', async () => {
     // given
     const timestamp = new Date().getTime().toString();
-    const stackName = 'test-stack' + timestamp;
+    const stackName = 'test-stack-2' + timestamp;
     const options: CloudFormationStackOptions = {
       stack: {
         name: stackName,
         template: { filepath: 'test/test-template.json' },
-        waitFor: false,
+        waitFor: true,
         deleteFailedChangeSet: false,
         parameterOverrides: [
           {
@@ -83,7 +83,6 @@ describe('deploy', () => {
     // when
     await CloudFormationStack.createStack(options).deploy();
 
-    options.stack.waitFor = true;
     options.stack.template.filepath = 'test/test-template-update.json';
     options.stack.parameterOverrides = [
       {
