@@ -25,7 +25,7 @@ export async function run() {
     const tags = core.getInput('tags') || '{}';
     const notificationArn = core.getInput('notificationArn');
     const terminationProtection = core.getInput('terminationProtection');
-    const parameterOverrides = core.getInput('parameterOverrides') || '{}';
+    const parameterOverrides = core.getInput('parameterOverrides') || '[]';
     const deleteFailedChangeSet = core.getInput('deleteFailedChangeSet');
     // filepath takes precedence over url
     const template: Template = templateFilePath

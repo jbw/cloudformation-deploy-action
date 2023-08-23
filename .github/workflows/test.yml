@@ -47,11 +47,7 @@ jobs:
           executeChangeSet: true
           enableRollback: false
           terminationProtection: false
-          parameterOverrides: |
-            {
-              "ParameterKey": "Environment",
-              "ParameterValue": "test"
-             }
+          parameterOverrides: '$(cat test/parameters.json)'
 
       - name: Integration tests
         run: |

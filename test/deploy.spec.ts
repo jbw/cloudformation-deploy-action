@@ -41,9 +41,11 @@ describe('deploy', () => {
         template: { filepath: 'test/test-template.json' },
         waitFor: true,
         deleteFailedChangeSet: false,
-        parameterOverrides: {
-          Environment: 'test',
-        },
+        parameterOverrides: [
+          {
+            Environment: 'test',
+          },
+        ],
       },
       client: {
         region: 'us-east-1',
