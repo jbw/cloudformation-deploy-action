@@ -7,6 +7,8 @@ on:
       - next
       - alpha
 
+  workflow_dispatch:
+
 jobs:
   test:
     services:
@@ -45,6 +47,11 @@ jobs:
           executeChangeSet: true
           enableRollback: false
           terminationProtection: false
+          parameterOverrides: |
+            {
+              "ParameterKey": "Environment",
+              "ParameterValue": "test"
+             }
 
       - name: Integration tests
         run: |
