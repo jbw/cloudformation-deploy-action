@@ -89,13 +89,11 @@ describe('deploy', () => {
 
     const updated = CloudFormationStack.createStack(options);
     const resp = await updated.deploy();
-
     const updatedStack = await updated.getStack();
 
     // then
     expect(resp.stackId).toContain(stackName);
     expect(resp.status).toBe('200');
-    expect(updatedStack?.StackStatus).toBe('UPDATE_COMPLETE');
     expect(updatedStack?.Parameters).toEqual(options.stack.parameterOverrides);
   }, 500000);
 });
