@@ -1,8 +1,7 @@
 import * as AWS from 'aws-sdk';
 import { Stack } from 'aws-sdk/clients/cloudformation';
-import * as fs from 'fs';
-
 import { CredentialsOptions } from 'aws-sdk/lib/credentials';
+import fs from 'fs';
 import { AWSWaitForResp } from '../../aws-wait-for-resp';
 import { CloudFormationChangeSet } from '../change-set/cloud-formation-change-set';
 import {
@@ -21,12 +20,18 @@ export class CloudFormationStack {
 
   public static createStack(options: CloudFormationStackOptions): CloudFormationStack {
     const client = this.createClient(options.client);
+
     return new CloudFormationStack(options.stack, client, new CloudFormationChangeSet(client));
   }
 
   public async deploy(): Promise<CloudFormationStackResponse> {
-    const stack = await this.getStack();
-    return !stack ? this.create() : this.update(stack);
+    const stack = await this.getStack(this.stackOptions.name);
+
+    if (stack) {
+      return this.update(stack);
+    }
+
+    return this.create();
   }
 
   private async create(): Promise<CloudFormationStackResponse> {
@@ -61,16 +66,31 @@ export class CloudFormationStack {
       params: input,
     });
 
+    if (waitFor) await this.waitForChangeSetCreation(changeSetName);
+    if (waitFor) await this.waitForStackUpdate();
+
     return {
       status: '200',
       stackId: stack.StackId,
     };
   }
 
-  public async getStack(): Promise<Stack | undefined> {
-    const stackDesc = await this.cf.describeStacks({ StackName: this.stackOptions.name }).promise();
+  public async getStack(name: string): Promise<Stack | undefined> {
+    try {
+      const stackDesc = await this.cf.describeStacks({ StackName: name }).promise();
 
-    return stackDesc?.Stacks?.[0];
+      if (this.stackOptions.waitFor) await this.waitForStackExists();
+
+      return stackDesc?.Stacks?.[0];
+    } catch (e) {
+      const error = e as AWS.AWSError | undefined;
+
+      if (error && error.statusCode === 400 && error.message.includes('does not exist')) {
+        return undefined;
+      }
+
+      throw e;
+    }
   }
 
   private buildChangeSetInput(stackName: string, changeSetName: string): AWS.CloudFormation.Types.CreateChangeSetInput {
@@ -163,6 +183,21 @@ export class CloudFormationStack {
   private waitForStackCreation(): Promise<AWSWaitForResp> {
     console.debug('Waiting for stack creation...');
     return this.cf.waitFor('stackCreateComplete', { StackName: this.stackOptions.name }).promise();
+  }
+
+  private waitForStackUpdate(): Promise<AWSWaitForResp> {
+    console.debug('Waiting for stack update...');
+    return this.cf.waitFor('stackUpdateComplete', { StackName: this.stackOptions.name }).promise();
+  }
+
+  private waitForChangeSetCreation(changeSetName: string): Promise<AWSWaitForResp> {
+    console.debug('Waiting for change set creation...');
+    return this.cf.waitFor('changeSetCreateComplete', { ChangeSetName: changeSetName }).promise();
+  }
+
+  private waitForStackExists(): Promise<AWSWaitForResp> {
+    console.debug('Waiting for describe stacks...');
+    return this.cf.waitFor('stackExists', { StackName: this.stackOptions.name }).promise();
   }
 
   private static createClient(options: CloudFormationClientOptions): AWS.CloudFormation {

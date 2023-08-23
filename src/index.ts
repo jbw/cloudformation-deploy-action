@@ -1,38 +1,16 @@
 import * as core from '@actions/core';
-import fs from 'fs';
 import path from 'path';
 
 import 'dotenv/config';
 
 import { CloudFormationStack } from './cloudformation/stack/cloud-formation-stack';
 import { Template } from './cloudformation/stack/cloud-formation-stack-options';
+import { createParameterOverrides } from './createParameterOverrides';
 
 const AWS_ENDPOINT_URL = process.env['AWS_ENDPOINT_URL'];
 const AWS_ACCESS_KEY_ID = process.env['AWS_ACCESS_KEY_ID'];
 const AWS_SECRET_ACCESS_KEY = process.env['AWS_SECRET_ACCESS_KEY'];
 const AWS_REGION = process.env['AWS_DEFAULT_REGION'];
-
-export function createParameterOverrides(parameterOverridesFilePath?: string, parameterOverridesString?: string) {
-  function loadFile(filepath: string) {
-    if (!fs.existsSync(filepath)) {
-      throw new Error(`File ${filepath} does not exist`);
-    }
-
-    const data = fs.readFileSync(filepath, 'utf8');
-
-    if (!data) {
-      throw new Error(`File ${filepath} is empty`);
-    }
-
-    return JSON.parse(data);
-  }
-
-  if (parameterOverridesFilePath) {
-    return loadFile(path.join(parameterOverridesFilePath));
-  } else if (parameterOverridesString) {
-    return JSON.parse(parameterOverridesString);
-  }
-}
 
 export async function run() {
   try {

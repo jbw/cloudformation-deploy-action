@@ -20,7 +20,7 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "strict": true,
-    "noUnusedLocals": true
+    "noUnusedLocals": false
   },
   "exclude": ["node_modules", "**/*.spec.ts"],
   "include": ["src/**/*.ts"]

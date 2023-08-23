@@ -1,7 +1,6 @@
 import 'dotenv/config';
 import { CloudFormationStack } from '../src/cloudformation/stack/cloud-formation-stack';
 import { CloudFormationStackOptions } from '../src/cloudformation/stack/cloud-formation-stack-options';
-import { createParameterOverrides } from '../src/index';
 
 const AWS_ACCESS_KEY_ID = process.env['AWS_ACCESS_KEY_ID'];
 const AWS_SECRET_ACCESS_KEY = process.env['AWS_SECRET_ACCESS_KEY'];
@@ -32,6 +31,7 @@ describe('deploy', () => {
       stack: {
         name: stackName,
         template: { filepath: 'test/test-template.json' },
+        waitFor: true,
       },
       client: {
         region: 'us-east-1',
@@ -46,10 +46,14 @@ describe('deploy', () => {
     // when
     const resp = await stack.deploy();
 
+    const stackInfo = await stack.getStack(options.stack.name);
+
     // then
     expect(resp.stackId).toContain(stackName);
     expect(resp.status).toBe('200');
-  });
+    expect(stackInfo?.StackName).toBe(stackName);
+    expect(stackInfo?.StackStatus).toBe('CREATE_COMPLETE');
+  }, 500000);
 
   it('should update', async () => {
     // given
@@ -90,7 +94,7 @@ describe('deploy', () => {
 
     const updated = CloudFormationStack.createStack(options);
     const resp = await updated.deploy();
-    const updatedStack = await updated.getStack();
+    const updatedStack = await updated.getStack(options.stack.name);
 
     // then
     expect(resp.stackId).toContain(stackName);
@@ -98,3 +102,6 @@ describe('deploy', () => {
     expect(updatedStack?.Parameters).toEqual(options.stack.parameterOverrides);
   }, 500000);
 });
+function createParameterOverrides(parameterOverridesFilePath: string, undefined: undefined) {
+  throw new Error('Function not implemented.');
+}
