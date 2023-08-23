@@ -59,7 +59,7 @@ describe('deploy', () => {
       stack: {
         name: stackName,
         template: { filepath: 'test/test-template.json' },
-        waitFor: true,
+        waitFor: false,
         deleteFailedChangeSet: false,
         parameterOverrides: [
           {
