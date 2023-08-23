@@ -79,6 +79,7 @@ describe('deploy', () => {
     // when
     await CloudFormationStack.createStack(options).deploy();
 
+    options.stack.waitFor = true;
     options.stack.template.filepath = 'test/test-template-update.json';
     options.stack.parameterOverrides = [
       {

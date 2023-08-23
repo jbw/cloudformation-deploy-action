@@ -4,7 +4,6 @@ import * as fs from 'fs';
 
 import { CredentialsOptions } from 'aws-sdk/lib/credentials';
 import { AWSWaitForResp } from '../../aws-wait-for-resp';
-import { ErrorOrAwsError } from '../../error-or-aws-error';
 import { CloudFormationChangeSet } from '../change-set/cloud-formation-change-set';
 import {
   CloudFormationClientOptions,
@@ -35,21 +34,14 @@ export class CloudFormationStack {
 
     const createStackInput = this.buildStackInput();
 
-    try {
-      const resp = await this.cf.createStack(createStackInput).promise();
+    const resp = await this.cf.createStack(createStackInput).promise();
 
-      if (waitFor) await this.waitForStackCreation();
+    if (waitFor) await this.waitForStackCreation();
 
-      return {
-        stackId: resp.StackId,
-        status: resp.$response.httpResponse.statusCode.toString(),
-      };
-    } catch (error: AWS.AWSError | Error | unknown) {
-      return {
-        status: this.isAwsError(error) ? error?.statusCode?.toString() : (error as Error).message.toString(),
-        stackId: undefined,
-      };
-    }
+    return {
+      stackId: resp.StackId,
+      status: resp.$response.httpResponse.statusCode.toString(),
+    };
   }
 
   private async update(stack: Stack): Promise<CloudFormationStackResponse> {
@@ -76,16 +68,9 @@ export class CloudFormationStack {
   }
 
   public async getStack(): Promise<Stack | undefined> {
-    try {
-      const stackDesc = await this.cf.describeStacks({ StackName: this.stackOptions.name }).promise();
+    const stackDesc = await this.cf.describeStacks({ StackName: this.stackOptions.name }).promise();
 
-      return stackDesc?.Stacks?.[0];
-    } catch (error: unknown) {
-      if (this.isAwsError(error)) {
-        if (error.code === 'ValidationError') return undefined;
-      }
-      throw error;
-    }
+    return stackDesc?.Stacks?.[0];
   }
 
   private buildChangeSetInput(stackName: string, changeSetName: string): AWS.CloudFormation.Types.CreateChangeSetInput {
@@ -194,13 +179,6 @@ export class CloudFormationStack {
     }
 
     return new AWS.CloudFormation(cfOptions);
-  }
-
-  private isAwsError(error: ErrorOrAwsError): error is AWS.AWSError {
-    if ((error as AWS.AWSError).statusCode) {
-      return true;
-    }
-    return false;
   }
 
   private readTemplate(templateFilePath: string): string {

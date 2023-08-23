@@ -45,11 +45,8 @@ export class CloudFormationChangeSet {
           };
         }
       } catch (error) {
-        console.error(error);
-        console.warn('Change set creation failed, deleting change set');
-
         await this.delete(changeSetName, stackName);
-        return { status: '500', error };
+        throw error;
       }
     }
 
