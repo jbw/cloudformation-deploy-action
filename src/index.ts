@@ -9,7 +9,26 @@ const AWS_ENDPOINT_URL = process.env['AWS_ENDPOINT_URL'];
 const AWS_ACCESS_KEY_ID = process.env['AWS_ACCESS_KEY_ID'];
 const AWS_SECRET_ACCESS_KEY = process.env['AWS_SECRET_ACCESS_KEY'];
 const AWS_REGION = process.env['AWS_DEFAULT_REGION'];
-const { GITHUB_WORKSPACE = __dirname } = process.env;
+
+export function createParameterOverrides(parameterOverridesFilePath?: string, parameterOverridesString?: string) {
+  function loadFile(filepath: string) {
+    if (!fs.existsSync(filepath)) {
+      throw new Error(`File ${filepath} does not exist`);
+    }
+
+    const data = fs.readFileSync(filepath, 'utf8');
+
+    if (!data) {
+      throw new Error(`File ${filepath} is empty`);
+    }
+
+    return JSON.parse(data);
+  }
+
+  return parameterOverridesFilePath
+    ? loadFile(path.join(parameterOverridesFilePath))
+    : JSON.parse(parameterOverridesString);
+}
 
 export async function run() {
   try {
@@ -31,14 +50,12 @@ export async function run() {
     const deleteFailedChangeSet = core.getInput('deleteFailedChangeSet');
 
     // template filepath takes precedence over url
-    const template: Template = templateFilePath
-      ? { filepath: path.join(GITHUB_WORKSPACE, templateFilePath) }
-      : { url: templateUrl };
+    const template: Template = templateFilePath ? { filepath: path.join(templateFilePath) } : { url: templateUrl };
 
     // parameterOverrides filepath takes precedence over url
-    const parameterOverrides = parameterOverridesFilePath
-      ? loadFile(path.join(GITHUB_WORKSPACE, parameterOverridesFilePath))
-      : JSON.parse(parameterOverridesInput);
+    const parameterOverrides = createParameterOverrides(parameterOverridesFilePath, parameterOverridesInput);
+
+    console.log('parameterOverrides', parameterOverrides);
 
     const stack = CloudFormationStack.createStack({
       stack: {
@@ -70,11 +87,6 @@ export async function run() {
   } catch (error) {
     console.error(error);
     core.setFailed('Action failed');
-  }
-
-  function loadFile(filepath: string) {
-    const data = fs.readFileSync(filepath, 'utf8');
-    return JSON.parse(data);
   }
 }
 

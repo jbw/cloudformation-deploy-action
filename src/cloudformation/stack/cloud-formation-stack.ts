@@ -3,6 +3,7 @@ import { Stack } from 'aws-sdk/clients/cloudformation';
 import * as fs from 'fs';
 
 import { AWSWaitForResp } from '../../aws-wait-for-resp';
+import { ErrorOrAwsError } from '../../error-or-aws-error';
 import { CloudFormationChangeSet } from '../change-set/cloud-formation-change-set';
 import {
   CloudFormationClientOptions,
@@ -10,7 +11,6 @@ import {
   CloudFormationStackOptions,
 } from './cloud-formation-stack-options';
 import { CloudFormationStackResponse } from './cloud-formation-stack-response';
-import { ErrorOrAwsError } from '../../error-or-aws-error';
 
 export class CloudFormationStack {
   constructor(
@@ -86,7 +86,7 @@ export class CloudFormationStack {
     }
   }
 
-  private buildStackInput() {
+  private buildStackInput(): AWS.CloudFormation.Types.CreateStackInput {
     const options: AWS.CloudFormation.Types.CreateStackInput = {
       StackName: this.stackOptions.name,
     };
@@ -97,6 +97,22 @@ export class CloudFormationStack {
 
     if (this.stackOptions.template.filepath) {
       options.TemplateBody = this.readTemplate(this.stackOptions.template.filepath);
+    }
+
+    if (this.stackOptions.capabilities) {
+      options.Capabilities = this.stackOptions.capabilities;
+    }
+
+    if (this.stackOptions.roleArn) {
+      options.RoleARN = this.stackOptions.roleArn;
+    }
+
+    if (this.stackOptions.parameterOverrides) {
+      options.Parameters = this.stackOptions.parameterOverrides;
+    }
+
+    if (this.stackOptions.timeout) {
+      options.TimeoutInMinutes = this.stackOptions.timeout;
     }
 
     return options;

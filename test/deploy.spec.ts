@@ -1,9 +1,26 @@
 import { CloudFormationStack } from '../src/cloudformation/stack/cloud-formation-stack';
 import { CloudFormationStackOptions } from '../src/cloudformation/stack/cloud-formation-stack-options';
+import { createParameterOverrides } from '../src/index';
 
 const LOCALSTACK_URL = process.env['LOCALSTACK_URL'] ?? 'http://localhost:4566';
 
 describe('deploy', () => {
+  it('should create overrides object', async () => {
+    // given
+    const parameterOverridesFilePath = 'test/parameters.json';
+
+    // when
+    const overrides = createParameterOverrides(parameterOverridesFilePath, undefined);
+
+    // then
+    expect(overrides).toEqual([
+      {
+        ParameterKey: 'Environment',
+        ParameterValue: 'test',
+      },
+    ]);
+  });
+
   it('should deploy', async () => {
     // given
     const timestamp = new Date().getTime().toString();
@@ -43,7 +60,8 @@ describe('deploy', () => {
         deleteFailedChangeSet: false,
         parameterOverrides: [
           {
-            Environment: 'test',
+            ParameterKey: 'Environment',
+            ParameterValue: 'test',
           },
         ],
       },
