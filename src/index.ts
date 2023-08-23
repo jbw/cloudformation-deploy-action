@@ -2,6 +2,8 @@ import * as core from '@actions/core';
 import fs from 'fs';
 import path from 'path';
 
+import 'dotenv/config';
+
 import { CloudFormationStack } from './cloudformation/stack/cloud-formation-stack';
 import { Template } from './cloudformation/stack/cloud-formation-stack-options';
 
