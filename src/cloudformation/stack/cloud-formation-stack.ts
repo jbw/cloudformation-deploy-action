@@ -67,7 +67,6 @@ export class CloudFormationStack {
     });
 
     if (waitFor) await this.waitForChangeSetCreation(changeSetName);
-    if (waitFor) await this.waitForStackUpdate();
 
     return {
       status: '200',

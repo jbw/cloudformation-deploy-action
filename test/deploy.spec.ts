@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import { CloudFormationStack } from '../src/cloudformation/stack/cloud-formation-stack';
 import { CloudFormationStackOptions } from '../src/cloudformation/stack/cloud-formation-stack-options';
+import { createParameterOverrides } from '../src/createParameterOverrides';
 
 const AWS_ACCESS_KEY_ID = process.env['AWS_ACCESS_KEY_ID'];
 const AWS_SECRET_ACCESS_KEY = process.env['AWS_SECRET_ACCESS_KEY'];
@@ -101,6 +102,3 @@ describe('deploy', () => {
     expect(updatedStack?.Parameters).toEqual(options.stack.parameterOverrides);
   }, 500000);
 });
-function createParameterOverrides(parameterOverridesFilePath: string, undefined: undefined) {
-  throw new Error('Function not implemented.');
-}
