@@ -1,4 +1,5 @@
 import * as core from '@actions/core';
+import fs from 'fs';
 import path from 'path';
 
 import { CloudFormationStack } from './cloudformation/stack/cloud-formation-stack';
@@ -25,12 +26,19 @@ export async function run() {
     const tags = core.getInput('tags') || '{}';
     const notificationArn = core.getInput('notificationArn');
     const terminationProtection = core.getInput('terminationProtection');
-    const parameterOverrides = core.getInput('parameterOverrides') || '[]';
+    const parameterOverridesInput = core.getInput('parameterOverrides') || '[]';
+    const parameterOverridesFilePath = core.getInput('parameterOverridesFilePath');
     const deleteFailedChangeSet = core.getInput('deleteFailedChangeSet');
-    // filepath takes precedence over url
+
+    // template filepath takes precedence over url
     const template: Template = templateFilePath
       ? { filepath: path.join(GITHUB_WORKSPACE, templateFilePath) }
       : { url: templateUrl };
+
+    // parameterOverrides filepath takes precedence over url
+    const parameterOverrides = parameterOverridesFilePath
+      ? loadFile(path.join(GITHUB_WORKSPACE, parameterOverridesFilePath))
+      : JSON.parse(parameterOverridesInput);
 
     const stack = CloudFormationStack.createStack({
       stack: {
@@ -45,7 +53,7 @@ export async function run() {
         roleArn,
         tags: JSON.parse(tags),
         notificationArn,
-        parameterOverrides: JSON.parse(parameterOverrides),
+        parameterOverrides: parameterOverrides,
         deleteFailedChangeSet: new Boolean(deleteFailedChangeSet) as boolean,
       },
       client: {
@@ -62,6 +70,11 @@ export async function run() {
   } catch (error) {
     console.error(error);
     core.setFailed('Action failed');
+  }
+
+  function loadFile(filepath: string) {
+    const data = fs.readFileSync(filepath, 'utf8');
+    return JSON.parse(data);
   }
 }
 

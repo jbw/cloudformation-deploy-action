@@ -10,7 +10,7 @@ inputs:
 
   templateFile:
     description: 'The relative path to the template file'
-    required: true
+    required: false
     default: ''
 
   templateUrl:
@@ -67,6 +67,11 @@ inputs:
     description: 'The parameter overrides to add to the stack'
     required: false
     default: '{}'
+
+  parameterOverridesFilePath:
+    description: 'The path to the parameter overrides file'
+    required: false
+    default: ''
 
 runs:
   using: node16
