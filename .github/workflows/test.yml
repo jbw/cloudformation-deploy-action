@@ -47,7 +47,7 @@ jobs:
           executeChangeSet: true
           enableRollback: false
           terminationProtection: false
-          parameterOverrides: $(cat test/parameters.json)
+          parameterOverrides: 'test/parameters.json'
 
       - name: Integration tests
         run: |
