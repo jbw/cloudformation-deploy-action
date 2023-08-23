@@ -2,13 +2,19 @@
 
 ## Testing
 
-1. Spin up Localstack
+### Create .env file
+
+```sh
+cp .env.template .env
+```
+
+### Spin up LocalStack
 
 ```sh
 docker run --rm -it -p 4566:4566 -p 4571:4571 localstack/localstack
 ```
 
-2. Run tests
+### Run tests
 
 ```
 npm run test
