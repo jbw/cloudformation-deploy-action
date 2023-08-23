@@ -5,20 +5,23 @@ export class CloudFormationChangeSet {
   constructor(private readonly cf: AWS.CloudFormation) {}
 
   public async create(options: {
-    changeSetName: string;
-    stackName: string;
     template: string;
     waitFor?: boolean;
     execute?: boolean;
     deleteFailedChangeSets?: boolean;
+    params: AWS.CloudFormation.CreateChangeSetInput;
   }) {
-    const { changeSetName, stackName, template, waitFor, execute } = options;
+    const {
+      template,
+      waitFor,
+      execute,
+      params: { ChangeSetName: changeSetName, StackName: stackName },
+    } = options;
 
     const createChangeSetResp = await this.cf
       .createChangeSet({
-        StackName: stackName,
-        ChangeSetName: changeSetName,
         TemplateBody: template,
+        ...options.params,
       })
       .promise();
 

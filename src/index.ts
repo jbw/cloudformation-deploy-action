@@ -27,9 +27,11 @@ export function createParameterOverrides(parameterOverridesFilePath?: string, pa
     return JSON.parse(data);
   }
 
-  return parameterOverridesFilePath
-    ? loadFile(path.join(parameterOverridesFilePath))
-    : JSON.parse(parameterOverridesString);
+  if (parameterOverridesFilePath) {
+    return loadFile(path.join(parameterOverridesFilePath));
+  } else if (parameterOverridesString) {
+    return JSON.parse(parameterOverridesString);
+  }
 }
 
 export async function run() {
@@ -57,8 +59,6 @@ export async function run() {
     // parameterOverrides filepath takes precedence over url
     const parameterOverrides = createParameterOverrides(parameterOverridesFilePath, parameterOverridesInput);
 
-    console.log('parameterOverrides', parameterOverrides);
-
     const stack = CloudFormationStack.createStack({
       stack: {
         name: stackName,
@@ -76,7 +76,7 @@ export async function run() {
         deleteFailedChangeSet: new Boolean(deleteFailedChangeSet) as boolean,
       },
       client: {
-        region: AWS_REGION,
+        region: AWS_REGION || 'us-east-1',
         accessKeyId: AWS_ACCESS_KEY_ID,
         secretAccessKey: AWS_SECRET_ACCESS_KEY,
         endpoint: AWS_ENDPOINT_URL,

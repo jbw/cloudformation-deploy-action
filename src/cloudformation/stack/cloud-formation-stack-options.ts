@@ -13,9 +13,9 @@ export type CloudFormationCreateStackOptions = {
   enableRollback?: boolean;
   terminationProtection?: boolean;
   roleArn?: string;
-  tags?: { [key: string]: string };
+  tags?: { Key: string; Value: string }[];
   notificationArn?: string;
-  parameterOverrides?: { [key: string]: string }[];
+  parameterOverrides?: { ParameterKey: string; ParameterValue: string }[];
   deleteFailedChangeSet?: boolean;
 };
 

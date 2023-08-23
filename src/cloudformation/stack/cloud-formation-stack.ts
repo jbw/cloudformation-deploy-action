@@ -2,6 +2,7 @@ import * as AWS from 'aws-sdk';
 import { Stack } from 'aws-sdk/clients/cloudformation';
 import * as fs from 'fs';
 
+import { CredentialsOptions } from 'aws-sdk/lib/credentials';
 import { AWSWaitForResp } from '../../aws-wait-for-resp';
 import { ErrorOrAwsError } from '../../error-or-aws-error';
 import { CloudFormationChangeSet } from '../change-set/cloud-formation-change-set';
@@ -25,7 +26,7 @@ export class CloudFormationStack {
   }
 
   public async deploy(): Promise<CloudFormationStackResponse> {
-    const stack = await this.getStack(this.stackOptions.name);
+    const stack = await this.getStack();
     return !stack ? this.create() : this.update(stack);
   }
 
@@ -43,28 +44,29 @@ export class CloudFormationStack {
         stackId: resp.StackId,
         status: resp.$response.httpResponse.statusCode.toString(),
       };
-    } catch (error: unknown) {
+    } catch (error: AWS.AWSError | Error | unknown) {
       return {
-        status: this.isAwsError(error) ? error.statusCode.toString() : (error as Error).message.toString(),
+        status: this.isAwsError(error) ? error?.statusCode?.toString() : (error as Error).message.toString(),
         stackId: undefined,
       };
     }
   }
 
   private async update(stack: Stack): Promise<CloudFormationStackResponse> {
+    console.debug('Updating stack...');
     const { waitFor } = this.stackOptions || {};
 
     if (!stack) return { status: '404' };
 
     const stackName = stack.StackName;
     const changeSetName = `${stackName}-changeset`;
+    const input = this.buildChangeSetInput(stackName, changeSetName);
 
     await this.changeSet.create({
-      changeSetName,
-      stackName,
-      template: this.readTemplate(this.stackOptions.template.filepath),
+      template: this.readTemplate(this.stackOptions.template.filepath!),
       waitFor,
       execute: true,
+      params: input,
     });
 
     return {
@@ -73,9 +75,9 @@ export class CloudFormationStack {
     };
   }
 
-  private async getStack(stackName: string): Promise<Stack | undefined> {
+  public async getStack(): Promise<Stack | undefined> {
     try {
-      const stackDesc = await this.cf.describeStacks({ StackName: stackName }).promise();
+      const stackDesc = await this.cf.describeStacks({ StackName: this.stackOptions.name }).promise();
 
       return stackDesc?.Stacks?.[0];
     } catch (error: unknown) {
@@ -84,6 +86,43 @@ export class CloudFormationStack {
       }
       throw error;
     }
+  }
+
+  private buildChangeSetInput(stackName: string, changeSetName: string): AWS.CloudFormation.Types.CreateChangeSetInput {
+    const options: AWS.CloudFormation.Types.CreateChangeSetInput = {
+      StackName: stackName,
+      ChangeSetName: changeSetName,
+    };
+
+    if (this.stackOptions.template.url) {
+      options.TemplateURL = this.stackOptions.template.url;
+    }
+
+    if (this.stackOptions.template.filepath) {
+      options.TemplateBody = this.readTemplate(this.stackOptions.template.filepath);
+    }
+
+    if (this.stackOptions.capabilities) {
+      options.Capabilities = this.stackOptions.capabilities;
+    }
+
+    if (this.stackOptions.roleArn) {
+      options.RoleARN = this.stackOptions.roleArn;
+    }
+
+    if (this.stackOptions.parameterOverrides) {
+      options.Parameters = this.stackOptions.parameterOverrides;
+    }
+
+    if (this.stackOptions.tags) {
+      options.Tags = this.stackOptions.tags;
+    }
+
+    if (this.stackOptions.notificationArn) {
+      options.NotificationARNs = [this.stackOptions.notificationArn];
+    }
+
+    return options;
   }
 
   private buildStackInput(): AWS.CloudFormation.Types.CreateStackInput {
@@ -111,6 +150,24 @@ export class CloudFormationStack {
       options.Parameters = this.stackOptions.parameterOverrides;
     }
 
+    if (this.stackOptions.tags) {
+      options.Tags = this.stackOptions.tags;
+    }
+
+    if (this.stackOptions.notificationArn) {
+      options.NotificationARNs = [this.stackOptions.notificationArn];
+    }
+
+    if (this.stackOptions.enableRollback) {
+      options.OnFailure = 'ROLLBACK';
+    } else {
+      options.OnFailure = 'DO_NOTHING';
+    }
+
+    if (this.stackOptions.terminationProtection) {
+      options.EnableTerminationProtection = true;
+    }
+
     if (this.stackOptions.timeout) {
       options.TimeoutInMinutes = this.stackOptions.timeout;
     }
@@ -126,12 +183,15 @@ export class CloudFormationStack {
   private static createClient(options: CloudFormationClientOptions): AWS.CloudFormation {
     const cfOptions: AWS.CloudFormation.Types.ClientConfiguration = {
       region: options.region,
-      credentials: {
-        accessKeyId: options.accessKeyId,
-        secretAccessKey: options.secretAccessKey,
-      },
       endpoint: options.endpoint,
     };
+
+    if (options.accessKeyId && options.secretAccessKey) {
+      cfOptions.credentials = {
+        accessKeyId: options.accessKeyId,
+        secretAccessKey: options.secretAccessKey,
+      } as CredentialsOptions;
+    }
 
     return new AWS.CloudFormation(cfOptions);
   }
