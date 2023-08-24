@@ -43,7 +43,7 @@ export async function run() {
         template: template,
         capabilities: [...capabilities.split(',').map((cap) => cap.trim())],
         timeout: parseInt(timeout),
-        waitFor: new Boolean(waitFor) as boolean,
+        waitFor: waitFor === 'true',
         executeChangeSet: new Boolean(executeChangeSet) as boolean,
         enableRollback: new Boolean(enableRollback) as boolean,
         terminationProtection: new Boolean(terminationProtection) as boolean,
