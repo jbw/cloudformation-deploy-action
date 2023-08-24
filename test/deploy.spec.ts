@@ -23,7 +23,7 @@ describe('deploy', () => {
     ]);
   });
 
-  it.only('should deploy and not wait for response', async () => {
+  it('should deploy and not wait for response', async () => {
     // given
     const timestamp = new Date().getTime().toString();
     const stackName = 'test-stack' + timestamp;
