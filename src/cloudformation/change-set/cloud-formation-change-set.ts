@@ -83,12 +83,16 @@ export class CloudFormationChangeSet {
   }
 
   public async execute(changeSetName: string, stackName: string, waitFor?: boolean) {
-    await this.cf
+    const resp = await this.cf
       .executeChangeSet({
         StackName: stackName,
         ChangeSetName: changeSetName,
       })
       .promise();
+
+    if (resp.$response.error) {
+      throw resp.$response.error;
+    }
 
     if (waitFor) {
       console.debug('Waiting for stack update to complete...');
