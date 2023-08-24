@@ -41,7 +41,7 @@ export class CloudFormationStack {
 
     const resp = await this.cf.createStack(createStackInput).promise();
 
-    if (waitFor) await this.waitForStackCreation();
+    await this.waitForStackCreation();
 
     return {
       stackId: resp.StackId,
@@ -66,7 +66,7 @@ export class CloudFormationStack {
       params: input,
     });
 
-    if (waitFor) await this.waitForChangeSetCreation(changeSetName);
+    await this.waitForChangeSetCreation(changeSetName);
 
     return {
       status: '200',
