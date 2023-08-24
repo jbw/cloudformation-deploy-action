@@ -1,5 +1,4 @@
-import 'dotenv/config';
-import { CloudFormationStack } from '../src/cloudformation/stack/cloud-formation-stack';
+import 'dotenv/config'; import { CloudFormationStack } from '../src/cloudformation/stack/cloud-formation-stack';
 import { CloudFormationStackOptions } from '../src/cloudformation/stack/cloud-formation-stack-options';
 import { createParameterOverrides } from '../src/createParameterOverrides';
 
@@ -22,6 +21,34 @@ describe('deploy', () => {
         ParameterValue: 'test',
       },
     ]);
+  });
+
+  it.only('should deploy and not wait for response', async () => {
+    // given
+    const timestamp = new Date().getTime().toString();
+    const stackName = 'test-stack' + timestamp;
+    const options = {
+      stack: {
+        name: stackName,
+        template: { filepath: 'test/test-template.json' },
+        waitFor: false,
+      },
+      client: {
+        region: 'us-east-1',
+        endpoint: LOCALSTACK_URL,
+        accessKeyId: 'accessKeyId',
+        secretAccessKey: 'secretAccessKey',
+      },
+    };
+
+    const stack = CloudFormationStack.createStack(options);
+
+    // when
+    const resp = await stack.deploy();
+
+    // then
+    expect(resp.stackId).toContain(stackName);
+    expect(resp.status).toBe('200');
   });
 
   it('should deploy', async () => {
