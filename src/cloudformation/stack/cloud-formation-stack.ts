@@ -51,27 +51,26 @@ export class CloudFormationStack {
 
   private async update(stack: Stack): Promise<CloudFormationStackResponse> {
     console.debug('Updating stack...');
-    const { waitFor } = this.stackOptions || {};
 
     if (!stack) return { status: '404' };
 
     const stackName = stack.StackName;
     const changeSetName = `${stackName}-changeset`;
     const input = this.buildChangeSetInput(stackName, changeSetName);
+    const template = this.readTemplate(this.stackOptions.template.filepath!);
 
-    await this.changeSet.create({
-      template: this.readTemplate(this.stackOptions.template.filepath!),
-      waitFor,
+    const resp = await this.changeSet.create({
+      template,
+      waitFor: true,
       execute: true,
       params: input,
     });
 
-    await this.waitForChangeSetCreation(changeSetName);
+    return resp;
+  }
 
-    return {
-      status: '200',
-      stackId: stack.StackId,
-    };
+  public getChangeSet(name: string, stackName: string): Promise<AWS.CloudFormation.Types.DescribeChangeSetOutput> {
+    return this.cf.describeChangeSet({ ChangeSetName: name, StackName: stackName }).promise();
   }
 
   public async getStack(name: string): Promise<Stack | undefined> {
@@ -182,16 +181,6 @@ export class CloudFormationStack {
   private waitForStackCreation(): Promise<AWSWaitForResp> {
     console.debug('Waiting for stack creation...');
     return this.cf.waitFor('stackCreateComplete', { StackName: this.stackOptions.name }).promise();
-  }
-
-  private waitForStackUpdate(): Promise<AWSWaitForResp> {
-    console.debug('Waiting for stack update...');
-    return this.cf.waitFor('stackUpdateComplete', { StackName: this.stackOptions.name }).promise();
-  }
-
-  private waitForChangeSetCreation(changeSetName: string): Promise<AWSWaitForResp> {
-    console.debug('Waiting for change set creation...');
-    return this.cf.waitFor('changeSetCreateComplete', { ChangeSetName: changeSetName }).promise();
   }
 
   private waitForStackExists(): Promise<AWSWaitForResp> {

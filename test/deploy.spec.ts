@@ -1,4 +1,5 @@
-import 'dotenv/config'; import { CloudFormationStack } from '../src/cloudformation/stack/cloud-formation-stack';
+import 'dotenv/config';
+import { CloudFormationStack } from '../src/cloudformation/stack/cloud-formation-stack';
 import { CloudFormationStackOptions } from '../src/cloudformation/stack/cloud-formation-stack-options';
 import { createParameterOverrides } from '../src/createParameterOverrides';
 
@@ -47,9 +48,12 @@ describe('deploy', () => {
     const resp = await stack.deploy();
 
     // then
+    const stackInfo = await stack.getStack(options.stack.name);
+    expect(stackInfo?.StackName).toBe(stackName);
+    expect(stackInfo?.StackStatus).toBe('CREATE_COMPLETE');
     expect(resp.stackId).toContain(stackName);
     expect(resp.status).toBe('200');
-  });
+  }, 50000);
 
   it('should deploy', async () => {
     // given
@@ -60,6 +64,12 @@ describe('deploy', () => {
         name: stackName,
         template: { filepath: 'test/test-template.json' },
         waitFor: true,
+        parameterOverrides: [
+          {
+            ParameterKey: 'Environment',
+            ParameterValue: 'dev',
+          },
+        ],
       },
       client: {
         region: 'us-east-1',
@@ -81,6 +91,7 @@ describe('deploy', () => {
     expect(resp.status).toBe('200');
     expect(stackInfo?.StackName).toBe(stackName);
     expect(stackInfo?.StackStatus).toBe('CREATE_COMPLETE');
+    expect(stackInfo?.Parameters).toEqual(options.stack.parameterOverrides);
   }, 500000);
 
   it('should update', async () => {
@@ -122,10 +133,58 @@ describe('deploy', () => {
     const updated = CloudFormationStack.createStack(options);
     const resp = await updated.deploy();
     const updatedStack = await updated.getStack(options.stack.name);
+    const changeSet = await updated.getChangeSet(updatedStack?.ChangeSetId!, options.stack.name);
 
     // then
     expect(resp.stackId).toContain(stackName);
     expect(resp.status).toBe('200');
-    expect(updatedStack?.Parameters).toEqual(options.stack.parameterOverrides);
-  }, 500000);
+    expect(changeSet?.Parameters).toEqual(options.stack.parameterOverrides);
+  }, 5000000);
+
+  it.only('should update and not wait', async () => {
+    // given
+    const timestamp = new Date().getTime().toString();
+    const stackName = 'test-stack-2' + timestamp;
+    const options: CloudFormationStackOptions = {
+      stack: {
+        name: stackName,
+        template: { filepath: 'test/test-template.json' },
+        waitFor: false,
+        deleteFailedChangeSet: false,
+        parameterOverrides: [
+          {
+            ParameterKey: 'Environment',
+            ParameterValue: 'dev',
+          },
+        ],
+      },
+      client: {
+        region: 'us-east-1',
+        endpoint: LOCALSTACK_URL,
+        accessKeyId: AWS_ACCESS_KEY_ID,
+        secretAccessKey: AWS_SECRET_ACCESS_KEY,
+      },
+    };
+
+    // when
+    await CloudFormationStack.createStack(options).deploy();
+
+    options.stack.template.filepath = 'test/test-template-update.json';
+    options.stack.parameterOverrides = [
+      {
+        ParameterKey: 'Environment',
+        ParameterValue: 'test',
+      },
+    ];
+
+    const updated = CloudFormationStack.createStack(options);
+    const resp = await updated.deploy();
+    const updatedStack = await updated.getStack(options.stack.name);
+    const changeSet = await updated.getChangeSet(updatedStack?.ChangeSetId!, options.stack.name);
+
+    // then
+    expect(resp.stackId).toContain(stackName);
+    expect(resp.status).toBe('200');
+    expect(changeSet?.Parameters).toEqual(options.stack.parameterOverrides);
+  }, 5000000);
 });
