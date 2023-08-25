@@ -141,7 +141,7 @@ describe('deploy', () => {
     expect(changeSet?.Parameters).toEqual(options.stack.parameterOverrides);
   }, 5000000);
 
-  it.only('should update and not wait', async () => {
+  it('should update and not wait', async () => {
     // given
     const timestamp = new Date().getTime().toString();
     const stackName = 'test-stack-2' + timestamp;
