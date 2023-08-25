@@ -1,5 +1,6 @@
 import * as AWS from 'aws-sdk';
 import { PromiseResult } from 'aws-sdk/lib/request';
+import { AWSWaitForResp } from '../../aws-wait-for-resp';
 
 export class CloudFormationChangeSet {
   constructor(private readonly cf: AWS.CloudFormation) {}
@@ -29,18 +30,13 @@ export class CloudFormationChangeSet {
       console.debug('Waiting for change set creation');
 
       try {
-        const waitForResp = await this.cf
-          .waitFor('changeSetCreateComplete', {
-            StackName: stackName,
-            ChangeSetName: changeSetName,
-          })
-          .promise();
+        const waitForResp = await this.waitForChangeSetCreation(stackName, changeSetName);
 
         if (waitForResp.ExecutionStatus === 'EXECUTE_COMPLETE') {
           console.debug('Change set execution already complete');
 
           return {
-            status: '200',
+            status: waitForResp.$response.httpResponse.statusCode.toString(),
             stackId: waitForResp.StackId,
           };
         }
@@ -56,7 +52,7 @@ export class CloudFormationChangeSet {
     }
 
     return {
-      status: '200',
+      status: createChangeSetResp.$response.httpResponse.statusCode.toString(),
       stackId: createChangeSetResp.StackId,
     };
   }
@@ -96,13 +92,29 @@ export class CloudFormationChangeSet {
 
     if (waitFor) {
       console.debug('Waiting for stack update to complete...');
-      await this.waitForStackCreation(stackName);
+      //await this.waitForStackUpdate(stackName);
+      //await this.waitForStackCreation(stackName);
     }
   }
 
-  private waitForStackCreation(
-    stackName: string,
-  ): Promise<PromiseResult<AWS.CloudFormation.DescribeStacksOutput, AWS.AWSError>> {
+  private waitForStackCreation(stackName: string): Promise<AWSWaitForResp> {
     return this.cf.waitFor('stackCreateComplete', { StackName: stackName }).promise();
+  }
+
+  private waitForStackUpdate(stackName: string): Promise<AWSWaitForResp> {
+    console.debug('Waiting for stack update...');
+    return this.cf.waitFor('stackUpdateComplete', { StackName: stackName }).promise();
+  }
+
+  private waitForChangeSetCreation(
+    stackName: string,
+    changeSetName: string,
+  ): Promise<PromiseResult<AWS.CloudFormation.DescribeChangeSetOutput, AWS.AWSError>> {
+    return this.cf
+      .waitFor('changeSetCreateComplete', {
+        StackName: stackName,
+        ChangeSetName: changeSetName,
+      })
+      .promise();
   }
 }
