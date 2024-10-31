@@ -1,6 +1,6 @@
+import { setFailed } from '@actions/core';
 import * as AWS from 'aws-sdk';
 import { Stack } from 'aws-sdk/clients/cloudformation';
-import { CredentialsOptions } from 'aws-sdk/lib/credentials';
 import fs from 'fs';
 import { AWSWaitForResp } from '../../aws-wait-for-resp';
 import { CloudFormationChangeSet } from '../change-set/cloud-formation-change-set';
@@ -187,27 +187,20 @@ export class CloudFormationStack {
   }
 
   private static createClient(options: CloudFormationClientOptions): AWS.CloudFormation {
+    if (!options.accessKeyId || !options.secretAccessKey) {
+      setFailed('Access Key ID is required');
+      throw new Error('Access Key ID and Secret Acess Key is required');
+    }
+
     const cfOptions: AWS.CloudFormation.Types.ClientConfiguration = {
       region: options.region,
       endpoint: options.endpoint,
-    };
-
-    if (options.accessKeyId && options.secretAccessKey) {
-      cfOptions.credentials = {
+      credentials: {
         accessKeyId: options.accessKeyId,
         secretAccessKey: options.secretAccessKey,
-      } as CredentialsOptions;
-    }
-
-    if (options.sessionToken) {
-      cfOptions.credentials = {
         sessionToken: options.sessionToken,
-      } as CredentialsOptions;
-    }
-
-    if (cfOptions.credentials === undefined) {
-      console.warn('Credentials not provided');
-    }
+      },
+    };
 
     return new AWS.CloudFormation(cfOptions);
   }

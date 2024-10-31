@@ -114,6 +114,8 @@ describe('deploy', () => {
         region: 'us-east-1',
         endpoint: LOCALSTACK_URL,
         sessionToken: 'test',
+        accessKeyId: 'accessKeyId',
+        secretAccessKey: 'secretAccessKey',
       },
     };
 
