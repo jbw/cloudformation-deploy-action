@@ -35,8 +35,6 @@ export class CloudFormationStack {
   }
 
   private async create(): Promise<CloudFormationStackResponse> {
-    const { waitFor } = this.stackOptions || {};
-
     const createStackInput = this.buildStackInput();
 
     const resp = await this.cf.createStack(createStackInput).promise();
@@ -199,6 +197,16 @@ export class CloudFormationStack {
         accessKeyId: options.accessKeyId,
         secretAccessKey: options.secretAccessKey,
       } as CredentialsOptions;
+    }
+
+    if (options.sessionToken) {
+      cfOptions.credentials = {
+        sessionToken: options.sessionToken,
+      } as CredentialsOptions;
+    }
+
+    if (cfOptions.credentials === undefined) {
+      console.warn('Credentials not provided');
     }
 
     return new AWS.CloudFormation(cfOptions);

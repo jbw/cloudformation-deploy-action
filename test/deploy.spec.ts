@@ -94,6 +94,44 @@ describe('deploy', () => {
     expect(stackInfo?.Parameters).toEqual(options.stack.parameterOverrides);
   }, 500000);
 
+  it('should deploy with session token', async () => {
+    // given
+    const timestamp = new Date().getTime().toString();
+    const stackName = 'test-stack' + timestamp;
+    const options: CloudFormationStackOptions = {
+      stack: {
+        name: stackName,
+        template: { filepath: 'test/test-template.json' },
+        waitFor: true,
+        parameterOverrides: [
+          {
+            ParameterKey: 'Environment',
+            ParameterValue: 'dev',
+          },
+        ],
+      },
+      client: {
+        region: 'us-east-1',
+        endpoint: LOCALSTACK_URL,
+        sessionToken: 'test',
+      },
+    };
+
+    const stack = CloudFormationStack.createStack(options);
+
+    // when
+    const resp = await stack.deploy();
+
+    const stackInfo = await stack.getStack(options.stack.name);
+
+    // then
+    expect(resp.stackId).toContain(stackName);
+    expect(resp.status).toBe('200');
+    expect(stackInfo?.StackName).toBe(stackName);
+    expect(stackInfo?.StackStatus).toBe('CREATE_COMPLETE');
+    expect(stackInfo?.Parameters).toEqual(options.stack.parameterOverrides);
+  }, 500000);
+
   it('should update', async () => {
     // given
     const timestamp = new Date().getTime().toString();

@@ -24,6 +24,7 @@ export type CloudFormationClientOptions = {
   accessKeyId?: string;
   secretAccessKey?: string;
   endpoint?: string;
+  sessionToken?: string;
 };
 
 export type Template = TemplateFile | TemplateUrl;

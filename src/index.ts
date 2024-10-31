@@ -10,6 +10,7 @@ import { createParameterOverrides } from './createParameterOverrides';
 const AWS_ENDPOINT_URL = process.env['AWS_ENDPOINT_URL'];
 const AWS_ACCESS_KEY_ID = process.env['AWS_ACCESS_KEY_ID'];
 const AWS_SECRET_ACCESS_KEY = process.env['AWS_SECRET_ACCESS_KEY'];
+const AWS_SESSION_TOKEN = process.env['AWS_SESSION_TOKEN'];
 const AWS_REGION = process.env['AWS_DEFAULT_REGION'];
 
 export async function run() {
@@ -58,6 +59,7 @@ export async function run() {
         accessKeyId: AWS_ACCESS_KEY_ID,
         secretAccessKey: AWS_SECRET_ACCESS_KEY,
         endpoint: AWS_ENDPOINT_URL,
+        sessionToken: AWS_SESSION_TOKEN,
       },
     });
 
